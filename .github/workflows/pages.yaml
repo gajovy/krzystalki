@@ -1,0 +1,51 @@
+name: "Publish to Krzyśtałki"
+on: push
+
+jobs:
+
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: checkout-repo
+        uses: actions/checkout@v2
+
+      - name: setup-python
+        uses: actions/setup-python@v2
+
+      - name: setup-pelican
+        run: test -f requirements.txt && pip install -r requirements.txt
+
+      - name: build-page
+        run: make clean && make html        
+      
+      - name: upload-artifacts
+        uses: actions/upload-artifact@2
+        with:
+          name: krzystalki-gh-pages
+          path: output
+
+  publish:
+    runs-on: ubuntu-latest
+    permissions: 
+      contents: write
+    steps:
+
+      - name: checkout-repo
+        uses: actions/checkout@v2
+        with:
+          ref: gh-pages
+        
+      - name: download-artifacts
+        uses: actions/download-artifact@2
+        with:
+          name: krzystalki-gh-pages
+
+      - name: push-to-gh-pages
+        env: 
+          - GIT_AUTHOR_NAME: "github-actions[bot]"
+          - GIT_AUTHOR_EMAIL: "41898282+github-actions[bot]@users.noreply.github.com"
+        run: |
+          git add .
+          git commit -m "update GH-Pages"
+          git push
+
