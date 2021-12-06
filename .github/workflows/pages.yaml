@@ -1,5 +1,8 @@
 name: "Publish to Krzyśtałki"
-on: push
+on: 
+  push:
+    paths:
+      - "content/**"
 
 jobs:
 
